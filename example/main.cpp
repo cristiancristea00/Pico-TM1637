@@ -1,6 +1,7 @@
 #include <pico/binary_info/code.h>
 #include "../TM1637.hpp"
 #include <memory>
+#include <pico/time.h>
 
 int main()
 {
@@ -13,5 +14,6 @@ int main()
     bi_decl(bi_1pin_with_name(CLK, "[CLK] Scoreboard clock pin"))
 
     auto led_segments = std::make_unique<TM1637>(DIO, CLK, pio);
+    led_segments->Display(-612, false, true);
 }
 
