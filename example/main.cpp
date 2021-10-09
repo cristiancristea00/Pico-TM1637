@@ -1,7 +1,7 @@
 #include <pico/binary_info/code.h>
+#include <pico/time.h>
 #include "../TM1637.hpp"
 #include <memory>
-#include <pico/time.h>
 
 int main()
 {
@@ -10,10 +10,31 @@ int main()
     constexpr auto CLK = 28;
     auto * pio = pio0;
 
-    bi_decl(bi_1pin_with_name(DIO, "[DIO] Scoreboard data pin"))
-    bi_decl(bi_1pin_with_name(CLK, "[CLK] Scoreboard clock pin"))
+    bi_decl(bi_1pin_with_name(DIO, "[DIO] LED segments data pin"))
+    bi_decl(bi_1pin_with_name(CLK, "[CLK] LED segments clock pin"))
 
     auto led_segments = std::make_unique<TM1637>(DIO, CLK, pio);
-    led_segments->Display(-612, false, true);
+
+    static constexpr size_t PAUSE_MS = 5000;
+
+    for (size_t i = 0; i <= 100; ++i)
+    {
+        led_segments->Display(i, true);
+        sleep_ms(100);
+    }
+
+    sleep_ms(PAUSE_MS);
+
+    for (size_t i = 0; i <= 0x100; ++i)
+    {
+        led_segments->DisplayHex(i, true);
+        sleep_ms(100);
+    }
+
+    sleep_ms(PAUSE_MS);
+
+    led_segments->ColonOn();
+    led_segments->DisplayLeft(15);
+    led_segments->DisplayRight(45);
 }
 

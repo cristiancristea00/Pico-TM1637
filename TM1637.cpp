@@ -131,13 +131,7 @@ auto TM1637::Two_Digits_To_Segment(data number, bool hex, bool leading_zeros) no
     return segments;
 }
 
-void TM1637::SetBrightness(byte brightness_level) noexcept
-{
-    brightness = std::min(brightness_level, MAX_BRIGHTNESS);
-    Send_4_Bytes(current_segments);
-}
-
-void TM1637::Display(int16_t number, bool hex, bool leading_zeros) noexcept
+void TM1637::Internal_Display(int16_t number, bool hex, bool leading_zeros) noexcept
 {
     static constexpr byte DASH = 0x40;
 
@@ -208,7 +202,7 @@ void TM1637::Display(int16_t number, bool hex, bool leading_zeros) noexcept
     Send_4_Bytes(current_segments);
 }
 
-void TM1637::DisplayLeft(data number, bool hex, bool leading_zeros) noexcept
+void TM1637::Internal_Display_Left(data number, bool hex, bool leading_zeros) noexcept
 {
     static constexpr size_t LEFT_BYTE_MASK = 0xFFFF0000;
 
@@ -220,7 +214,7 @@ void TM1637::DisplayLeft(data number, bool hex, bool leading_zeros) noexcept
     Send_4_Bytes(current_segments);
 }
 
-void TM1637::DisplayRight(data number, bool hex, bool leading_zeros) noexcept
+void TM1637::Internal_Display_Right(data number, bool hex, bool leading_zeros) noexcept
 {
     static constexpr size_t RIGHT_BYTE_MASK = 0x0000FFFF;
 
@@ -230,6 +224,42 @@ void TM1637::DisplayRight(data number, bool hex, bool leading_zeros) noexcept
     {
         ColonOn();
     }
+    Send_4_Bytes(current_segments);
+}
+
+void TM1637::Display(int16_t number, bool leading_zeros) noexcept
+{
+    Internal_Display(number, false, leading_zeros);
+}
+
+void TM1637::DisplayHex(int16_t number, bool leading_zeros) noexcept
+{
+    Internal_Display(number, true, leading_zeros);
+}
+
+void TM1637::DisplayLeft(data number, bool leading_zeros) noexcept
+{
+    Internal_Display_Left(number, false, leading_zeros);
+}
+
+void TM1637::DisplayLeftHex(data number, bool leading_zeros) noexcept
+{
+    Internal_Display_Left(number, true, leading_zeros);
+}
+
+void TM1637::DisplayRight(data number, bool leading_zeros) noexcept
+{
+    Internal_Display_Right(number, false, leading_zeros);
+}
+
+void TM1637::DisplayRightHex(data number, bool leading_zeros) noexcept
+{
+    Internal_Display_Right(number, true, leading_zeros);
+}
+
+void TM1637::SetBrightness(byte brightness_level) noexcept
+{
+    brightness = std::min(brightness_level, MAX_BRIGHTNESS);
     Send_4_Bytes(current_segments);
 }
 

@@ -91,6 +91,33 @@ class TM1637
      */
     static auto Two_Digits_To_Segment(data number, bool hex = false, bool leading_zeros = false) noexcept -> data;
 
+    /**
+     * Internal function to display a number on all four digits.
+     *
+     * @param number The number to be displayed
+     * @param hex The hex display option
+     * @param leading_zeros Optional leading zeros
+     */
+    void Internal_Display(int16_t number, bool hex = false, bool leading_zeros = false) noexcept;
+
+    /**
+     * Internal function to display a number on the most significant two digits.
+     *
+     * @param number The number to be displayed
+     * @param hex The hex display option
+     * @param leading_zeros Optional leading zeros
+     */
+    void Internal_Display_Left(data number, bool hex = false, bool leading_zeros = false) noexcept;
+
+    /**
+     * Internal function to display a number on the least significant two digits.
+     *
+     * @param number The number to be displayed
+     * @param hex The hex display option
+     * @param leading_zeros Optional leading zeros
+     */
+    void Internal_Display_Right(data number, bool hex = false, bool leading_zeros = false) noexcept;
+
  public:
 
     /**
@@ -103,39 +130,60 @@ class TM1637
     TM1637(byte DIO, byte CLK, PIO pio) noexcept;
 
     /**
+     * Display a number on all four digits.
+     *
+     * @param number
+     * @param leading_zeros
+     */
+    void Display(int16_t number, bool leading_zeros = false) noexcept;
+
+    /**
+     * Display a number on all four digits in hex format.
+     *
+     * @param number
+     * @param leading_zeros
+     */
+    void DisplayHex(int16_t number, bool leading_zeros = false) noexcept;
+
+    /**
+     * Display a number on the most significant two digits.
+     *
+     * @param number
+     * @param leading_zeros
+     */
+    void DisplayLeft(data number, bool leading_zeros = false) noexcept;
+
+    /**
+     * Display a number on the most significant two digits in hex format.
+     *
+     * @param number
+     * @param leading_zeros
+     */
+    void DisplayLeftHex(data number, bool leading_zeros = false) noexcept;
+
+    /**
+     * Display a number on the least significant two digits.
+     *
+     * @param number
+     * @param leading_zeros
+     */
+    void DisplayRight(data number, bool leading_zeros = false) noexcept;
+
+    /**
+     * Display a number on the least significant two digits in hex format.
+     *
+     * @param number
+     * @param leading_zeros
+     */
+    void DisplayRightHex(data number, bool leading_zeros = false) noexcept;
+
+    /**
      * Sets the brightness brightness_level. The minimum brightness_level is 0
      * and the maximum is 7.
      *
      * @param brightness_level The desired brightness brightness_level
      */
     void SetBrightness(byte brightness_level) noexcept;
-
-    /**
-     * Display a number on all four digits.
-     *
-     * @param number The number to be displayed
-     * @param hex The hex display option
-     * @param leading_zeros Optional leading zeros
-     */
-    void Display(int16_t number, bool hex = false, bool leading_zeros = false) noexcept;
-
-    /**
-     * Display a number on the most significant two digits.
-     *
-     * @param number The number to be displayed
-     * @param hex The hex display option
-     * @param leading_zeros Optional leading zeros
-     */
-    void DisplayLeft(data number, bool hex = false, bool leading_zeros = false) noexcept;
-
-    /**
-     * Display a number on the least significant two digits.
-     *
-     * @param number The number to be displayed
-     * @param hex The hex display option
-     * @param leading_zeros Optional leading zeros
-     */
-    void DisplayRight(data number, bool hex = false, bool leading_zeros = false) noexcept;
 
     /**
      * Turns on the middle colon.
