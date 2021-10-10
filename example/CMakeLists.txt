@@ -26,7 +26,7 @@ pico_generate_pio_header(Pico_TM1637 ${CMAKE_CURRENT_LIST_DIR}/../TM1637.pio)
 
 # Add program info
 pico_set_program_name(Pico_TM1637 "TODO")
-pico_set_program_version(Pico_TM1637 "1.0.0")
+pico_set_program_version(Pico_TM1637 "1.0.1")
 pico_set_program_url(Pico_TM1637 "https://github.com/cristiancristea00/Pico-TM1637")
 pico_set_program_description(Pico_TM1637 "Copyright (c) 2021 Cristian Cristea")
 
@@ -49,5 +49,5 @@ set(CMAKE_CXX_FLAGS_DEBUG "-pipe -g -O0 -Wfatal-errors -Wpedantic -Wall -Wextra 
 set(CMAKE_C_FLAGS_DEBUG "-pipe -g -O0 -Wfatal-errors -Wpedantic -Wall -Wextra -Wconversion -Wshadow=local -Wdouble-promotion -Wformat=2 -Wformat-overflow=2 -Wformat-nonliteral -Wformat-security -Wformat-truncation=2 -Wnull-dereference -Wimplicit-fallthrough=3 -Wshift-overflow=2 -Wswitch-default -Wunused-parameter -Wunused-const-variable=2 -Wstrict-overflow=4 -Wstringop-overflow=3 -Wsuggest-attribute=pure -Wsuggest-attribute=const -Wsuggest-attribute=noreturn -Wmissing-noreturn -Wsuggest-attribute=malloc -Wsuggest-attribute=format -Wmissing-format-attribute -Wsuggest-attribute=cold -Walloc-zero -Walloca -Wattribute-alias=2 -Wduplicated-branches -Wcast-qual")
 
 # Set Release build compiler arguments
-set(CMAKE_CXX_FLAGS_RELEASE "-pipe -O2 -fno-builtin")
-set(CMAKE_C_FLAGS_RELEASE "-pipe -O2 -fno-builtin")
+set(CMAKE_CXX_FLAGS_RELEASE "-pipe -Os -fno-builtin")
+set(CMAKE_C_FLAGS_RELEASE "-pipe -Os -fno-builtin")
