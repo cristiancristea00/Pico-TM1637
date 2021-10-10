@@ -16,19 +16,20 @@ int main()
     auto led_segments = std::make_unique<TM1637>(DIO, CLK, pio);
 
     static constexpr size_t PAUSE_MS = 5000;
+    static constexpr size_t COUNT_STEP_MS = 100;
 
-    for (size_t i = 0; i <= 100; ++i)
+    for (int16_t i = 0; i <= 100; ++i)
     {
-        led_segments->Display(i, true);
-        sleep_ms(100);
+        led_segments->Display(i);
+        sleep_ms(COUNT_STEP_MS);
     }
 
     sleep_ms(PAUSE_MS);
 
-    for (size_t i = 0; i <= 0x100; ++i)
+    for (int16_t i = 0; i <= 0x100; ++i)
     {
         led_segments->DisplayHex(i, true);
-        sleep_ms(100);
+        sleep_ms(COUNT_STEP_MS);
     }
 
     sleep_ms(PAUSE_MS);

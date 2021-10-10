@@ -22,12 +22,12 @@ inline void TM1637::Init(byte DIO, byte CLK) noexcept
 {
     static constexpr size_t PULL_THRESHOLD = 32;
 
-    state_machine = pio_claim_unused_sm(pio, true);
+    state_machine = static_cast<byte>(pio_claim_unused_sm(pio, true));
     auto offset = pio_add_program(pio, &TM1637_program);
     state_machine_config = TM1637_program_get_default_config(offset);
 
     sm_config_set_sideset_pins(&state_machine_config, CLK);
-    auto both_pins = (1 << CLK) | (1 << DIO);
+    uint32_t both_pins = (1 << CLK) | (1 << DIO);
     pio_sm_set_pins_with_mask(pio, state_machine, both_pins, both_pins);
     pio_sm_set_pindirs_with_mask(pio, state_machine, both_pins, both_pins);
 
@@ -45,7 +45,7 @@ inline void TM1637::Init(byte DIO, byte CLK) noexcept
 inline void TM1637::Set_Clock_Divider() noexcept
 {
     static constexpr size_t FREQUENCY = 45'000;
-    static constexpr size_t MAX_DIVIDER_VALUE = 65536;
+    static constexpr size_t MAX_DIVIDER_VALUE = 65'536;
 
     data system_frequency = clock_get_hz(clk_sys);
     float divider = static_cast<float>(system_frequency) / FREQUENCY;
@@ -62,7 +62,7 @@ inline void TM1637::Set_Clock_Divider() noexcept
 
 void TM1637::Send_4_Bytes(data value) const noexcept
 {
-    static constexpr size_t BIT_MASK = 0xFFFF;
+    static constexpr size_t BIT_MASK = 0xFF'FF;
     static constexpr size_t SHIFT_POSITIONS = 16;
 
     static data data_1;
@@ -86,7 +86,7 @@ auto TM1637::Number_To_Segments(data number, bool hex, data bitmask) noexcept ->
     static data segments;
     static data temp_segments;
 
-    if (number <= max_one_digit)
+    if (std::cmp_less_equal(number, max_one_digit))
     {
         segments = DIGIT_TO_SEGMENTS.at(number);
     }
@@ -108,7 +108,7 @@ auto TM1637::Number_To_Segments(data number, bool hex, data bitmask) noexcept ->
 
 auto TM1637::Two_Digits_To_Segment(data number, bool hex, bool leading_zeros) noexcept -> TM1637::data
 {
-    static constexpr size_t BIT_MASK = 0xFFFF;
+    static constexpr size_t BIT_MASK = 0xFF'FF;
 
     data segments = Number_To_Segments(number, hex, BIT_MASK);
 
@@ -135,22 +135,23 @@ void TM1637::Internal_Display(int16_t number, bool hex, bool leading_zeros) noex
 {
     static constexpr byte DASH = 0x40;
 
-    bool is_positive {};
+    bool is_positive {true};
+    uint16_t number_copy {0};
 
-    auto base = hex ? BASE_HEX : BASE_TEN;
+    int16_t base = hex ? BASE_HEX : BASE_TEN;
 
     if (number >= 0)
     {
         is_positive = true;
+        number_copy = static_cast<uint16_t>(number);
     }
     else
     {
         is_positive = false;
-        number = static_cast<int16_t>(-number);
+        number_copy = static_cast<uint16_t>(-number);
     }
 
     byte length = 0;
-    auto number_copy = number;
 
     while (number_copy != 0)
     {
@@ -158,12 +159,12 @@ void TM1637::Internal_Display(int16_t number, bool hex, bool leading_zeros) noex
         number_copy /= base;
     }
 
-    if (length > 3 + static_cast<int>(is_positive))
+    if (length > 3 + static_cast<byte>(is_positive))
     {
-        length = 3 + static_cast<int>(is_positive);
+        length = 3 + static_cast<byte>(is_positive);
     }
 
-    auto segments = Number_To_Segments(number, hex);
+    auto segments = Number_To_Segments(static_cast<data>(number), hex);
     byte start_position = 0;
     if (leading_zeros && length < MAX_DIGITS)
     {
@@ -204,7 +205,7 @@ void TM1637::Internal_Display(int16_t number, bool hex, bool leading_zeros) noex
 
 void TM1637::Internal_Display_Left(data number, bool hex, bool leading_zeros) noexcept
 {
-    static constexpr size_t LEFT_BYTE_MASK = 0xFFFF0000;
+    static constexpr size_t LEFT_BYTE_MASK = 0xFF'FF'00'00;
 
     current_segments = (current_segments & LEFT_BYTE_MASK) + Two_Digits_To_Segment(number, hex, leading_zeros);
     if (is_colon)
@@ -216,7 +217,7 @@ void TM1637::Internal_Display_Left(data number, bool hex, bool leading_zeros) no
 
 void TM1637::Internal_Display_Right(data number, bool hex, bool leading_zeros) noexcept
 {
-    static constexpr size_t RIGHT_BYTE_MASK = 0x0000FFFF;
+    static constexpr size_t RIGHT_BYTE_MASK = 0x00'00'FF'FF;
 
     current_segments = (current_segments & RIGHT_BYTE_MASK) +
             (Two_Digits_To_Segment(number, hex, leading_zeros) << (2 * BYTE_SIZE));
@@ -265,7 +266,7 @@ void TM1637::SetBrightness(byte brightness_level) noexcept
 
 void TM1637::ColonOn() noexcept
 {
-    static constexpr size_t CONTROL_DISPLAY = 0x8000;
+    static constexpr size_t CONTROL_DISPLAY = 0x80'00;
 
     is_colon = true;
     current_segments |= CONTROL_DISPLAY;
@@ -274,7 +275,7 @@ void TM1637::ColonOn() noexcept
 
 void TM1637::ColonOff() noexcept
 {
-    static constexpr size_t CONTROL_DISPLAY = 0x8000;
+    static constexpr size_t CONTROL_DISPLAY = 0x80'00;
 
     is_colon = false;
     current_segments &= ~CONTROL_DISPLAY;
@@ -284,7 +285,7 @@ void TM1637::ColonOff() noexcept
 void TM1637::Clear() const noexcept
 {
     static constexpr size_t CONTROL_DISPLAY = 0x80;
-    static constexpr size_t WRITE_ADDRESS_AND_MODE = 0xC040;
+    static constexpr size_t WRITE_ADDRESS_AND_MODE = 0xC0'40;
 
     pio_sm_put_blocking(pio, state_machine, CONTROL_DISPLAY);
     pio_sm_put_blocking(pio, state_machine, WRITE_ADDRESS_AND_MODE);
